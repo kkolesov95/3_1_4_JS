@@ -3,18 +3,18 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
   <meta charset="UTF-8">
-  <title>All Users</title>
+  <title>User</title>
 </head>
 <body>
 
-<div th:each ="users : ${users}">
-  <a th:href="@{/users/{id}(id=${users.id})}" th:text="${users.name}">users</a>
-</div>
+<p th:text="${user.id}">id</p>
+<p th:text="${user.name}">name</p>
+<p th:text="${user.lastname}">lastname</p>
+<p th:text="${user.age}">age</p>
 
 <br/>
 <hr/>
 
-<a href="/admin/users/new" sec:authorize="hasRole('ROLE_ADMIN')">Create new user</a>
 <br/>
 <a href="/login" >logout</a>
 
