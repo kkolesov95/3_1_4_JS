@@ -39,6 +39,6 @@ public class Users {
     @Column(name = "age")
     private byte age;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Roles> roles;
 }
