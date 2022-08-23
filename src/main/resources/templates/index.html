@@ -7,6 +7,10 @@
 </head>
 <body>
 
+<div th:text = "${currentUser.email}"></div>
+<div th:text="' with roles: ' + ${#strings.listJoin(currentUserRoles,' ')}"></div>
+<br/>
+
 <div th:each ="users : ${users}">
   <a th:href="@{/users/{id}(id=${users.id})}" th:text="${users.name}">users</a>
 </div>

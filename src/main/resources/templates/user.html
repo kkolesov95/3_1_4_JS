@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>User</title>
+</head>
+<body>
+
+<div th:text = "${currentUser.email}"></div>
+<div th:text="' with roles: ' + ${#strings.listJoin(currentUserRoles,' ')}"></div>
+<br/>
+
+<p th:text="${currentUser.id}">id</p>
+<p th:text="${currentUser.name}">name</p>
+<p th:text="${currentUser.lastname}">lastname</p>
+<p th:text="${currentUser.age}">age</p>
+<p th:text="${currentUser.email}">email</p>
+
+<br/>
+<hr/>
+
+<br/>
+<a href="/login" >logout</a>
+
+</body>
+</html>

@@ -40,19 +40,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-                .antMatchers("/admin/**").access("hasAnyRole('ROLE_ADMIN')")
-                .antMatchers("/user/**").access("hasAnyRole('ROLE_USER','ROLE_ADMIN')");
+                .antMatchers("/admin/**").access("hasAnyRole('ADMIN')")
+                .antMatchers("/user/**").access("hasAnyRole('USER','ADMIN')");
 
 
         http.formLogin()
-                .permitAll()
+                .loginPage("/").permitAll()
                 .usernameParameter("user_email")
                 .passwordParameter("user_password")
-                .successHandler(successUserHandler).permitAll();
+                .successHandler(successUserHandler)
+                .loginProcessingUrl("/").permitAll()
+                .permitAll();
 
         http.logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login").permitAll();
+                .logoutUrl("/logout").permitAll()
+                .logoutSuccessUrl("/login");
 
         http.csrf().disable();
     }

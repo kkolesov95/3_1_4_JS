@@ -60,23 +60,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(Users users) {
+    public Users saveUser(Users users) {
         Users checkUser = userRepository.findByEmail(users.getEmail());
         if(checkUser==null) {
-            Roles roles = roleRepository.findByRole("ROLE_USER");
-            if (roles != null) {
-                ArrayList<Roles> roles1 = new ArrayList<>();
-                roles1.add(roles);
-                users.setRoles(roles1);
+            Roles role = roleRepository.findByRole("ROLE_USER");
+            if (role != null) {
+                ArrayList<Roles> roles = new ArrayList<>();
+                roles.add(role);
+                users.setRoles(roles);
                 users.setPassword(passwordEncoder.encode(users.getPassword()));
+                userRepository.save(users);
             }
         }
-        userRepository.save(users);
+        return null;
     }
 
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Roles> getAllRoles() {
+        return roleRepository.findAll();
     }
 }
 

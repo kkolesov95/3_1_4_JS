@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.entities.Users;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
+import java.util.stream.Collectors;
+
 @Controller
 public class UsersController {
 
@@ -19,22 +21,34 @@ public class UsersController {
         this.userService = userService;
     }
 
-    @GetMapping("/admin/users")
+    @GetMapping(value = {"/", "/login"})
+    public String login() {
+        return "login";
+    }
+
+
+    @GetMapping("admin")
     public String index(Model model) {
+        model.addAttribute("currentUser", getUserData());
+        model.addAttribute("currentUserRoles",
+                getUserData().getRoles()
+                        .stream()
+                        .map(x -> x.getRole().replaceFirst("ROLE_", ""))
+                        .collect(Collectors.toList()));
         model.addAttribute("users", userService.index());
         return "index";
     }
 
-    @GetMapping("/user/indexUser")
+    @GetMapping("user")
     public String indexUser(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Users users = null;
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            User secUser = (User) authentication.getPrincipal();
-            users = userService.findByEmail(secUser.getUsername());
-        }
-        model.addAttribute("user", users);
-        return "indexUser";
+        model.addAttribute("currentUser", getUserData());
+        model.addAttribute("currentUserRoles",
+                getUserData().getRoles()
+                        .stream()
+                        .map(x -> x.getRole().replaceFirst("ROLE_", ""))
+                        .collect(Collectors.toList()));
+        model.addAttribute("currentUser", getUserData());
+        return "user";
     }
 
     @GetMapping("/users/{id}")
@@ -70,5 +84,15 @@ public class UsersController {
     public String delete(@PathVariable("id") Long id) {
         userService.deleteById(id);
         return "redirect:/admin/users";
+    }
+
+    private Users getUserData() {
+        Authentication authentication =SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            User secUser = (User)authentication.getPrincipal();
+            Users myUser = userService.findByEmail(secUser.getUsername());
+            return myUser;
+        }
+        return null;
     }
 }
