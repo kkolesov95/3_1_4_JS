@@ -1,9 +1,12 @@
 package ru.kata.spring.boot_security.demo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,9 @@ public class UsersController {
 
     private final UserService userService;
 
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
+
     public UsersController(UserService userService) {
         this.userService = userService;
     }
@@ -29,6 +35,7 @@ public class UsersController {
 
     @GetMapping("admin")
     public String index(Model model) {
+        Users users = new Users();
         model.addAttribute("currentUser", getUserData());
         model.addAttribute("currentUserRoles",
                 getUserData().getRoles()
@@ -36,6 +43,8 @@ public class UsersController {
                         .map(x -> x.getRole().replaceFirst("ROLE_", ""))
                         .collect(Collectors.toList()));
         model.addAttribute("users", userService.index());
+        model.addAttribute("allRoles", userService.getAllRoles());
+        model.addAttribute("newUser", users);
         return "index";
     }
 
@@ -51,39 +60,24 @@ public class UsersController {
         return "user";
     }
 
-    @GetMapping("/users/{id}")
-    public String show(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.findById(id));
-        return "show";
-    }
-
-    @GetMapping("/admin/users/new")
-    public String newUser(Users users) {
-        return "new";
-    }
-
-    @PostMapping("/users")
-    public String create(Users users) {
+    @PostMapping( "/admin/add_user")
+    public String saveUser(@ModelAttribute Users users) {
         userService.saveUser(users);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/admin/users/{id}/edit")
-    public String edit(Model model, @PathVariable("id") Long id) {
-        model.addAttribute("users", userService.findById(id));
-        return "edit";
+    @PostMapping("/admin/save_user")
+    public String updateUser(@ModelAttribute Users users) {
+        String pass = passwordEncoder.encode(users.getPassword());
+        users.setPassword(pass);
+        userService.update(users);
+        return "redirect:/admin";
     }
 
-    @PostMapping("/users/{id}")
-    public String update(Users users) {
-        userService.saveUser(users);
-        return "redirect:/admin/users";
-    }
-
-    @DeleteMapping("/users/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    @PostMapping("/admin/delete_user")
+    public String delete(@RequestParam("id") Long id) {
         userService.deleteById(id);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
     private Users getUserData() {

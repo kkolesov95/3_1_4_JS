@@ -1,26 +1,90 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>User</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css'}"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous">
+    <script th:src="@{'https://code.jquery.com/jquery-3.6.0.min.js'}" type="text/javascript"></script>
+    <script th:src="@{'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js'}"
+            integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <link rel="icon" href="icon.ico?v=1" type="image/x-icon">
+    <title>User page</title>
+    <nav class="navbar navbar-dark bg-dark justify-content-between">
+        <div class="d-flex bd-highlight">
+            <div class="p-0 flex-grow-1 text-white bg-dark">
+                <a class="navbar-brand mb-0 h1"
+                   th:text="${currentUser.email} + ' with roles: ' + ${#strings.listJoin(currentUserRoles,' ')}"> </a>
+            </div>
+        </div>
+        <form class="nav-item">
+            <ul class="navbar-nav">
+                <a class="nav-link" th:href="@{'/logout'}">Logout</a>
+            </ul>
+        </form>
+    </nav>
+
 </head>
-<body>
-
-<div th:text = "${currentUser.email}"></div>
-<div th:text="' with roles: ' + ${#strings.listJoin(currentUserRoles,' ')}"></div>
-<br/>
-
-<p th:text="${currentUser.id}">id</p>
-<p th:text="${currentUser.name}">name</p>
-<p th:text="${currentUser.lastname}">lastname</p>
-<p th:text="${currentUser.age}">age</p>
-<p th:text="${currentUser.email}">email</p>
-
-<br/>
-<hr/>
-
-<br/>
-<a href="/login" >logout</a>
-
+<body class="text-dark bg-light">
+<div class="container-fluid flex">
+    <div class="row min-vh-100">
+        <div class="col-md-2 p-0 pt-3 bg-white">
+            <div class="nav flex-column nav-pills" id="list-tab">
+                <a class="nav-link active" id="list-home-list" data-toggle="list" href="#list-home" role="tab"
+                   aria-controls="home">User</a>
+            </div>
+        </div>
+        <div class="col-md-10 px-4 py-3 mt-0">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                    <h1 class="mb-3 ml-3">User information-page</h1>
+                    <div class="col-sm-9">
+                        <div class="card">
+                            <h5 class="card-header">About user</h5>
+                            <div class="col-12">
+                                <div class="card-body">
+                                    <div class="container" th:fragment="user_information">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>First Name</th>
+                                                        <th>Last Name</th>
+                                                        <th>Age</th>
+                                                        <th>Username</th>
+                                                        <th>Roles</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr th:object="${currentUser}">
+                                                        <td th:text="*{id}"></td>
+                                                        <td th:text="*{name}"></td>
+                                                        <td th:text="*{lastname}"></td>
+                                                        <td th:text="*{age}"></td>
+                                                        <td th:text="*{email}"></td>
+                                                        <td>
+                                                            <a th:each="role : *{roles}">
+                                                                <a th:text="${role.role.replaceFirst('ROLE_', '')}"></a>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
