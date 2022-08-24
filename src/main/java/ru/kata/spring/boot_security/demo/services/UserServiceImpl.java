@@ -59,6 +59,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Users saveUser(Users users) {
         Users checkUser = userRepository.findByEmail(users.getEmail());
@@ -75,6 +76,7 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
