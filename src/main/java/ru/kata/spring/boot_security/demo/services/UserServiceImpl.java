@@ -15,6 +15,7 @@ import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -49,11 +50,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     @Override
     public Users findById(Long id){
         return userRepository.getById(id);
     }
 
+    @Transactional
     @Override
     public List<Users> index() {
         return userRepository.findAll();
