@@ -1,7 +1,6 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,11 +19,12 @@ public class UsersController {
 
     private final UserService userService;
 
-    @Autowired
-    BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UsersController(UserService userService) {
+    @Autowired
+    public UsersController(UserService userService, BCryptPasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping(value = {"/", "/login"})
@@ -37,12 +37,9 @@ public class UsersController {
     public String index(Model model) {
         Users users = new Users();
         model.addAttribute("currentUser", getUserData());
-        model.addAttribute("currentUserRoles",
-                getUserData().getRoles()
-                        .stream()
-                        .map(x -> x.getRole().replaceFirst("ROLE_", ""))
-                        .collect(Collectors.toList()));
         model.addAttribute("users", userService.index());
+        model.addAttribute("currentUserRoles",
+                userService.getRolesAsListString(getUserData()));
         model.addAttribute("allRoles", userService.getAllRoles());
         model.addAttribute("newUser", users);
         return "index";
@@ -52,10 +49,7 @@ public class UsersController {
     public String indexUser(Model model) {
         model.addAttribute("currentUser", getUserData());
         model.addAttribute("currentUserRoles",
-                getUserData().getRoles()
-                        .stream()
-                        .map(x -> x.getRole().replaceFirst("ROLE_", ""))
-                        .collect(Collectors.toList()));
+                userService.getRolesAsListString(getUserData()));
         model.addAttribute("currentUser", getUserData());
         return "user";
     }
@@ -91,8 +85,7 @@ public class UsersController {
         Authentication authentication =SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             User secUser = (User)authentication.getPrincipal();
-            Users myUser = userService.findByEmail(secUser.getUsername());
-            return myUser;
+            return userService.findByEmail(secUser.getUsername());
         }
         return null;
     }

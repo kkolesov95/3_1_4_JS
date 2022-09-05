@@ -14,23 +14,24 @@ import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
     private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    @Autowired
+    public UserServiceImpl(BCryptPasswordEncoder passwordEncoder, UserRepository userRepository, RoleRepository roleRepository) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Transactional
@@ -38,8 +39,7 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         Users myUser = userRepository.findByEmail(s);
         if (myUser!=null) {
-            User secUser = new User(myUser.getEmail(), myUser.getPassword(), myUser.getRoles());
-            return secUser;
+            return new User(myUser.getEmail(), myUser.getPassword(), myUser.getRoles());
         }
 
         throw new UsernameNotFoundException("User Not Found");
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Users saveUser(Users users) {
+    public void saveUser(Users users) {
         Users checkUser = userRepository.findByEmail(users.getEmail());
         if(checkUser==null) {
             Roles role = roleRepository.findByRole("ROLE_USER");
@@ -76,7 +76,6 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(users);
             }
         }
-        return null;
     }
 
     @Transactional
@@ -94,6 +93,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void update(Users users) {
         userRepository.save(users);
+    }
+
+    @Override
+    public List<String> getRolesAsListString(Users users) {
+        return users.getRoles().stream()
+                .map(x -> x.getRole().replaceFirst("ROLE_", ""))
+                .collect(Collectors.toList());
     }
 }
 

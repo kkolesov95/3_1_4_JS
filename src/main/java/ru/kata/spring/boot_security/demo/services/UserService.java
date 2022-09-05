@@ -13,11 +13,14 @@ public interface UserService extends UserDetailsService {
 
     List<Roles> getAllRoles();
 
-    Users saveUser(Users users);
+    void saveUser(Users users);
 
     void deleteById(Long id);
 
     Users findByEmail(String email);
 
     void update(Users users);
+
+    List<String> getRolesAsListString(Users users);
+
 }
