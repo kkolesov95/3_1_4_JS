@@ -60,6 +60,13 @@ public class UsersController {
         return "user";
     }
 
+    @GetMapping("/admin/getuser")
+    @ResponseBody
+    public Users getUserById(Long id) {
+        return userService.findById(id);
+    }
+
+
     @PostMapping( "/admin/add_user")
     public String saveUser(@ModelAttribute Users users) {
         userService.saveUser(users);
